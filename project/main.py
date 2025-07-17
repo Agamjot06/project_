@@ -123,4 +123,4 @@ if page == "Page 3":
     
     st.subheader("About the Project")
     st.write("This project is developed by AGAMJOT KAUR, Btech(ECM) 3rd Year. It aims to provide a user-friendly interface for predicting water potability based on various water quality parameters. The model is built using XGBoost, a powerful machine learning algorithm known for its performance and speed.")
-    st.image("https://www.example.com/your_image.jpg", use_container_width=True)  # Replace with your image URL
+    
