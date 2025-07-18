@@ -10,7 +10,7 @@ model = joblib.load('xgboost_model.joblib')
 page_element="""
 <style>
 [data-testid="stAppViewContainer"]{
-  background-image: url("https://img.pikbest.com/back_our/20201230/bg/b5bb1ec670600.png!w700wp");
+  background-image: url("https://png.pngtree.com/thumb_back/fh260/background/20200606/pngtree-dual-color-gradient-with-rounded-light-effect-image_338148.jpg");
   background-size: cover;
 }
 [data-testid="stHeader"]{
@@ -26,10 +26,10 @@ st.subheader("Here, We will predict whether the water is Drinkable or not!")
 # Sidebar
 st.sidebar.header("Sidebar")
 st.sidebar.write("Select a page to navigate:")
-page= st.sidebar.selectbox("sidebar selectbox",["Page 1","Page 2","Page 3"])
+page= st.sidebar.selectbox("sidebar selectbox",["Introduction","Prediction","About Dataset"])
 
 #multi page application
-if page == "Page 1":
+if page == "Introduction":
     st.image("https://img.freepik.com/free-photo/realistic-water-drop-with-ecosystem_23-2151196394.jpg", use_container_width=True)
     st.subheader("Introduction to My Project")
     st.write("This project aims to predict the potability of water based on various water quality parameters. The model is trained using a dataset that includes features such as pH, hardness, solids, chloramines, sulfate, conductivity, organic carbon, trihalomethanes, and turbidity. The output will indicate whether the water is potable (safe for drinking) or non-potable (not safe for drinking).")   
@@ -45,14 +45,14 @@ if page == "Page 1":
     st.write("9. **Turbidity**: A measure of the cloudiness or haziness of water caused by large numbers of individual particles, measured in NTU (Nephelometric Turbidity Units).")
     
 
-if page == "Page 2":
+if page == "Prediction":
     st.image("https://intownplumbingtx.com/wp-content/uploads/2024/01/water-quality-blog-post-img.jpg", use_container_width=True)
     st.write("Enter the water quality parameters below to predict its potability:")
     col1,col2,col3 = st.columns(3)
     with col1:
         ph = st.number_input("PH", 0, 14)
         chloramines = st.number_input("Chloramines(mg/L)", 0, 15)
-        solids = st.number_input("Solids(mg/L)", 100, 5000)
+        solids = st.number_input("Solids(mg/L)", 100, 6000)
     with col2:
         Hardness = st.number_input("Hardness(mg/L)", 0, 1000)
         Sulfate = st.number_input("Sulfate(mg/L)", 0, 1000)
@@ -86,40 +86,61 @@ if page == "Page 2":
             st.warning("Water is not safe for Drinking.")
             st.image("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQAP_ysr2jgFwOUye0ujpLUD8QkjAKnwjbvoA&s",use_container_width=True)
 
-if page == "Page 3":
+if page == "About Dataset":
     st.subheader("Here are some graphs to visualize the data")
     df = pd.read_csv("water_potability dataset.csv")
     st.write("Dataset Shape: ", df.shape)
     st.write("Dataset Columns: ", df.columns.tolist())
-    st.write("There are some null values in the dataset, which will be handled during model training.Null values are present in th columns 'ph', 'Sulfate', 'Trihalomethanes'")
-    st. write("1. Let's visualize the distribution of 'ph' column:")
-    fig, ax = plt.subplots(figsize=(10,6))
-    ax.hist(df['ph'].dropna(), bins=30, alpha=0.5, label='pH', color='blue')
-    plt.title("Distribution of pH")
-    plt.xlabel("pH")
-    st.pyplot(fig)
+    st.write("There are some null values in the dataset, which will be handled during model training. Null values are present in the columns 'ph', 'Sulfate', 'Trihalomethanes'")
+    st. write(" Let's visualize the distribution of various columns:")
+    selected_column = st.selectbox(
+    "Select columns to visualize",
+    ["ph", "Sulfate", "Trihalomethanes", "Solids", "Hardness", 
+     "Chloramines", "Conductivity", "Organic_Carbon", "Turbidity"]
+)
 
-    st.write("2. Let's visualize the distribution of the 'Sulfate' column:")
-    fig, ax = plt.subplots(figsize=(10,6))
-    ax.hist(df['Sulfate'].dropna(), bins=30, alpha=0.5, label='Sulfate', color='blue')
-    plt.title("Distribution of Sulfate")
-    plt.xlabel("Sulfate")
-    st.pyplot(fig)
+# Define labels for each column
+    column_labels = {
+        "ph": ("pH", "pH"),
+        "Sulfate": ("Sulfate (mg/L)", "Sulfate"),
+        "Trihalomethanes": ("Trihalomethanes", "Trihalomethanes"),
+        "Solids": ("Solids (mg/L)", "Solids"),
+        "Hardness": ("Hardness (mg/L)", "Hardness"),
+        "Chloramines": ("Chloramines (mg/L)", "Chloramines"),
+        "Conductivity": ("Conductivity (µS/cm)", "Conductivity"),
+        "Organic_Carbon": ("Organic Carbon (mg/L)", "Organic Carbon"),
+        "Turbidity": ("Turbidity (NTU)", "Turbidity"),
+    }
+
+    # Plot
+    if selected_column:
+        xlabel, title = column_labels[selected_column]
+        fig, ax = plt.subplots(figsize=(10, 6))
+        ax.hist(df[selected_column].dropna(), bins=30, alpha=0.5, color='darkgreen')
+        ax.set_title(f"Distribution of {title}")
+        ax.set_xlabel(xlabel)
+        st.pyplot(fig)
     
-    st.write("3. Let's visualize the distribution of the 'Trihalomethanes' column:")
-    fig, ax = plt.subplots(figsize=(10,6))
-    ax.hist(df['Trihalomethanes'].dropna(), bins=30, alpha=0.5, label='Trihalomethanes', color='blue')
-    plt.title("Distribution of Trihalomethanes")
-    plt.xlabel("Trihalomethanes")
-    st.pyplot(fig)
-    
-    st.write("4.Correlation Heatmap")
+    st.write("Correlation Heatmap")
+    st.write("correlation between different features in the dataset can provide insights into how they relate to each other. Below is a heatmap showing the correlation between various water quality parameters:")
     correlation=df.corr()
     fig, ax = plt.subplots(figsize=(10, 6))
     sns.heatmap(correlation, annot=True, cmap='coolwarm', fmt=".2f", ax=ax) 
     ax.set_title('Correlation Heatmap')
     st.pyplot(fig)
     
+    st.write("Potability Distribution")
+    st.write("The distribution of potability in the dataset can be visualized using a count plot. This will show how many samples are potable (1) and non-potable (0).")
+    fig, ax = plt.subplots(figsize=(10, 6)) 
+    sns.countplot(x='Potability', data=df, ax=ax, palette='Set2')
+    ax.set_title('Potability Distribution')
+    ax.set_xlabel('Potability')
+    ax.set_ylabel('Count')
+    st.pyplot(fig)
+    st.write("The dataset contains a total of {} samples, with {} potable and {} non-potable samples.".format(
+        df.shape[0], df['Potability'].value_counts()[1], df['Potability'].value_counts()[0]))
+    
+
     
     st.subheader("About the Project")
     st.write("This project is developed by AGAMJOT KAUR, Btech(ECM) 3rd Year. It aims to provide a user-friendly interface for predicting water potability based on various water quality parameters. The model is built using XGBoost, a powerful machine learning algorithm known for its performance and speed.")
