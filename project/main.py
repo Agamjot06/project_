@@ -5,8 +5,9 @@ import seaborn as sns
 import streamlit as st
 import joblib
     
-model = joblib.load('xgboost_model.joblib')
+model = joblib.load('./savedModels/xgboost_model.joblib')
 
+#To set the background image 
 page_element="""
 <style>
 [data-testid="stAppViewContainer"]{
@@ -23,14 +24,69 @@ st.markdown(page_element, unsafe_allow_html=True)
 st.title("Water Quality Prediction")
 
 # Sidebar
-st.sidebar.header("Sidebar")
-st.sidebar.write("Select a page to navigate:")
-page= st.sidebar.selectbox("sidebar selectbox",["Introduction","Prediction","About Dataset"])
+#Setting the color for Sidebar using CSS
+#This will apply a light gray background, black text, dark blue border
+st.markdown("""
+    <style>
+        div[data-baseweb="select"] > div {
+        background-color: #E0E0E0 !important;  /* Light gray */
+        color: #000000 !important;             /* Black text */
+        border: 2px solid #003366 !important;  /* Light green border */
+        border-radius: 5px !important;
+        font-weight: bold;
+    }
+
+    /* Dropdown menu color */
+    div[data-baseweb="select"] ul {
+        background-color: #E6E6FA !important;  /* Light coral */
+        color: #001f3f !important;  /* Navy text */
+    }
+    </style>
+    """, unsafe_allow_html=True)
+st.sidebar.header("Navigator")
+page= st.sidebar.selectbox("Select a page to navigate",["Introduction","Predict Water Quality","About the Dataset"])
+
+
+# Set background for sidebar using CSS
+st.markdown("""
+    <style>
+    [data-testid="stSidebar"] {
+        background-image: url("https://htmlcolorcodes.com/assets/images/colors/steel-gray-color-solid-background-1920x1080.png");
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center;
+    }
+
+    /* Optional: make sidebar text more visible */
+    [data-testid="stSidebar"] * {
+        color: black;
+    }
+    </style>
+""", unsafe_allow_html=True)
+
 
 #multi page application
 if page == "Introduction":
     st.subheader("Here, We will predict whether the water is Drinkable or not!")
-    st.image("https://img.freepik.com/free-photo/realistic-water-drop-with-ecosystem_23-2151196394.jpg", use_container_width=True)
+    # Image URLs 
+    img1 = "https://img.freepik.com/free-photo/realistic-water-drop-with-ecosystem_23-2151196394.jpg"
+    img2 = "https://media.istockphoto.com/id/1390096829/photo/environment-engineer-collect-samples-of-wastewater-from-industrial-canals-in-test-tube-close.jpg?s=612x612&w=0&k=20&c=noNV_84cJSOyHkNtjUjuRaruAISjqjKoACShUhWkoRg="
+    img3 = "https://media.istockphoto.com/id/638079536/photo/human-hand-cupped-to-catch-fresh-water-from-river.jpg?s=612x612&w=0&k=20&c=eaotnDCv09h5f_txkeWZFH9x7E2hNYQo9kldtm18kJI="
+    img4 = "https://media.istockphoto.com/id/1183424538/photo/water-pouring-into-glass.jpg?s=612x612&w=0&k=20&c=ZEXKV_0eblwFXh_jf4T3kDX_VqYdFmS04lwCVg41NFY="
+
+    # First row of collage
+    col1, col2 = st.columns(2)
+    with col1:
+        st.image(img1, use_container_width=True)
+    with col2:
+        st.image(img2, use_container_width=True)
+
+    # Second row of collage
+    col3, col4 = st.columns(2)
+    with col3:
+        st.image(img3, use_container_width=True)
+    with col4:
+        st.image(img4, use_container_width=True)
     st.subheader("Introduction to My Project")
     st.write("Clean and safe drinking water is essential for human health and survival, yet over 2 billion people worldwide still rely on contaminated sources. Water pollution caused by industrial waste, agricultural runoff, and urbanization poses serious health risks, including waterborne diseases and long-term illnesses. Traditional methods of assessing water quality, though accurate, are time-consuming, expensive, and resource-intensive, limiting their practicality for large-scale or real-time monitoring. To address these challenges, this project explores the use of machine learning to predict the potability of water based on its physicochemical properties. Features such as pH, hardness, turbidity, sulfate, and organic carbon are analyzed using supervised learning algorithms to determine whether a given water sample is safe for consumption. The project involves several key steps: data exploration, preprocessing, feature selection, model training, and performance evaluation using metrics like accuracy, precision, recall, and F1-score. Multiple algorithms—including Logistic Regression, Random Forest, and XGBoost—are compared to find the most effective model. This project aims to predict the potability of water based on various water quality parameters. The output will indicate whether the water is potable (safe for drinking) or non-potable (not safe for drinking).")
     st.subheader("Let's discuss the parameters used in this project")
@@ -45,10 +101,27 @@ if page == "Introduction":
     st.write("9. **Turbidity**: A measure of the cloudiness or haziness of water caused by large numbers of individual particles, measured in NTU (Nephelometric Turbidity Units).")
     
 
-if page == "Prediction":
+if page == "Predict Water Quality":
     st.header("Predict Water Potability")
     st.image("https://intownplumbingtx.com/wp-content/uploads/2024/01/water-quality-blog-post-img.jpg", use_container_width=True)
     st.write("Enter the water quality parameters below to predict its potability:")
+    # To set the background color for number input elements using CSS
+    # This will apply a light gray background, black text, dark blue border
+    st.markdown("""
+    <style>
+    /* Target all number input elements */
+    input[type=number] {
+        background-color:  #E0E0E0 !important;  /* Light gray */
+        color: #000000 !important;             /* Black text */
+        border:  2px solid #003366 !important;  /* Dark blue border */
+        border-radius: 5px;
+        padding: 8px;
+        font-weight: bold;
+    }
+
+    
+    </style>
+    """, unsafe_allow_html=True)
     col1,col2,col3 = st.columns(3)
     with col1:
         ph = st.number_input("PH", 0, 14)
@@ -81,16 +154,17 @@ if page == "Prediction":
         if final_pred == 1:
             st.subheader("Potable")
             st.success("### Water is safe for Drinking.")
+            st.balloons()
             st.image("https://nutritionsource.hsph.harvard.edu/wp-content/uploads/2024/11/AdobeStock_362493206.jpeg",use_container_width=True)
         else:
             st.subheader("Non-Potable")
             st.warning("### Water is not safe for Drinking.")
             st.image("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQAP_ysr2jgFwOUye0ujpLUD8QkjAKnwjbvoA&s",use_container_width=True)
 
-if page == "About Dataset":
+if page == "About the Dataset":
     st.header("About the Dataset")
     st.subheader("Here are some graphs to visualize the data")
-    df = pd.read_csv("water_potability dataset.csv")
+    df = pd.read_csv("./dataset/water_potability dataset.csv")
     st.write("Dataset Shape: ", df.shape)
     st.write("Dataset Columns: ", df.columns.tolist())
     st.write("There are some null values in the dataset, which will be handled during model training. Null values are present in the columns 'ph', 'Sulfate', 'Trihalomethanes'")
